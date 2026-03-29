@@ -1,0 +1,148 @@
+{
+  "name": "harness-engineering",
+  "version": "1.0.0",
+  "description": "Harness Engineering - 一套完整的 AI 智能体工程化技能合集，包含网络搜索、代码改造、RAG 优化、天赋认知、思考模式切换等 16 个高级技能",
+  "author": "kiwifruit",
+  "license": "MIT",
+  "repository": "https://github.com/kiwifruit/HarnessEngineering",
+  "keywords": [
+    "ai-engineering",
+    "skills",
+    "agent",
+    "rag",
+    "web-search",
+    "code-refactoring",
+    "talent-development"
+  ],
+  "skills": [
+    {
+      "name": "agent-memory",
+      "path": "./skills/agent-memory",
+      "description": "AI 智能体记忆管理系统"
+    },
+    {
+      "name": "agent-reach",
+      "path": "./skills/agent-reach",
+      "description": "AI 智能体能力扩展框架"
+    },
+    {
+      "name": "agi-evolution-model-linux",
+      "path": "./skills/agi-evolution-model-linux",
+      "description": "AGI 进化模型（Linux 版本）"
+    },
+    {
+      "name": "beee-context-analyzer",
+      "path": "./skills/beee-context-analyzer",
+      "description": "BEEE 上下文分析器"
+    },
+    {
+      "name": "brain-framework",
+      "path": "./skills/brain-framework",
+      "description": "代码库改造框架 - 基于 Boris Tane 方法论的系统化改造方案"
+    },
+    {
+      "name": "deep-reading",
+      "path": "./skills/deep-reading",
+      "description": "深度阅读技能 - 文档和论文的深度理解工具"
+    },
+    {
+      "name": "function-calling-tutorial",
+      "path": "./skills/function-calling-tutorial",
+      "description": "函数调用教程 - 学习如何有效使用函数调用"
+    },
+    {
+      "name": "intelligent-environment-adapter",
+      "path": "./skills/intelligent-environment-adapter",
+      "description": "智能环境适配器 - 自适应环境配置系统"
+    },
+    {
+      "name": "meta-wisdom-transfer",
+      "path": "./skills/meta-wisdom-transfer",
+      "description": "元感悟传递引擎 - 传递完整的认知跃迁过程"
+    },
+    {
+      "name": "planning-with-files",
+      "path": "./skills/planning-with-files",
+      "description": "文件规划系统 - 基于文件的项目规划工具"
+    },
+    {
+      "name": "rag-optimization",
+      "path": "./skills/rag-optimization",
+      "description": "RAG 系统优化方案 - 17+ 种检索增强生成优化策略"
+    },
+    {
+      "name": "skill-behavior-guide",
+      "path": "./skills/skill-behavior-guide",
+      "description": "Skill 执行行为指导 - AI 智能体执行规范和质量保证"
+    },
+    {
+      "name": "summarize",
+      "path": "./skills/summarize",
+      "description": "文本摘要技能 - 高效的内容摘要和总结工具"
+    },
+    {
+      "name": "talent-cognition",
+      "path": "./skills/talent-cognition",
+      "description": "天赋认知框架 - 系统化的天赋识别和发展指导"
+    },
+    {
+      "name": "using-superpowers",
+      "path": "./skills/using-superpowers",
+      "description": "超能力使用指南 - Skill 使用规范和最佳实践"
+    },
+    {
+      "name": "web-search-free",
+      "path": "./skills/web-search-free",
+      "description": "免费网络搜索 - 无需 API Key 的多引擎网络搜索"
+    }
+  ],
+  "categories": {
+    "web-search": [
+      "web-search-free"
+    ],
+    "code-engineering": [
+      "brain-framework",
+      "planning-with-files"
+    ],
+    "rag-optimization": [
+      "rag-optimization"
+    ],
+    "ai-behavior": [
+      "skill-behavior-guide",
+      "using-superpowers",
+      "thinking-mode-switcher"
+    ],
+    "cognition-development": [
+      "meta-wisdom-transfer",
+      "talent-cognition",
+      "deep-reading"
+    ],
+    "agent-systems": [
+      "agent-memory",
+      "agent-reach",
+      "intelligent-environment-adapter",
+      "beee-context-analyzer"
+    ],
+    "advanced-models": [
+      "agi-evolution-model-linux",
+      "function-calling-tutorial"
+    ],
+    "content-processing": [
+      "summarize"
+    ]
+  },
+  "dependencies": {
+    "system": [
+      "python3",
+      "git"
+    ],
+    "optional": [
+      "node",
+      "npm"
+    ]
+  },
+  "installation": {
+    "method": "skillhub",
+    "command": "skillhub install harness-engineering"
+  }
+}
