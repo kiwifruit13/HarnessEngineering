@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 数据加密模块
 
@@ -137,8 +156,8 @@ class KeyManager:
 
         return key_id, key_bytes
 
+    @staticmethod
     def derive_key_from_password(
-        self,
         password: str,
         salt: Optional[bytes] = None,
     ) -> tuple[bytes, bytes]:
@@ -473,7 +492,7 @@ def encrypt_data_with_password(
         (salt, encrypted_data)
     """
     # 派生密钥
-    key, salt = KeyManager().derive_key_from_password(password)
+    key, salt = KeyManager.derive_key_from_password(password)
 
     # 加密
     nonce: bytes = secrets.token_bytes(NONCE_LENGTH)
@@ -501,7 +520,7 @@ def decrypt_data_with_password(
         明文数据
     """
     # 派生密钥
-    key, _ = KeyManager().derive_key_from_password(password, salt)
+    key, _ = KeyManager.derive_key_from_password(password, salt)
 
     # 分离 nonce 和 ciphertext
     nonce: bytes = encrypted_data[:NONCE_LENGTH]

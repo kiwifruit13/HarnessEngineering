@@ -1,6 +1,6 @@
 {
   "name": "harness-engineering",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Harness Engineering - 一套完整的 AI 智能体工程化技能合集，包含网络搜索、代码改造、RAG 优化、天赋认知、思考模式切换等 16 个高级技能",
   "author": "kiwifruit",
   "license": "MIT",

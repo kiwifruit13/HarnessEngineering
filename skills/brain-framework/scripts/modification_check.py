@@ -13,8 +13,16 @@ Modification Check 脚本 - 修改类型检查
 
 import argparse
 import json
+import os
 import sys
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
+
+# 平台 SDK（运行环境已预装）
+try:
+    from coze_workload_identity import requests
+    COZE_SDK_AVAILABLE = True
+except ImportError:
+    COZE_SDK_AVAILABLE = False
 
 
 class ModificationCheckOutput:
@@ -117,7 +125,9 @@ class RuleChecker:
 def llm_judge(changes_text: str, plan_summary: str, 
               affected_files: List[str]) -> ModificationCheckOutput:
     """
-    使用 LLM 进行语义判断（简化版）
+    使用 LLM 进行语义判断
+    
+    通过平台提供的 LLM API 进行智能判断，识别修改类型。
     
     Args:
         changes_text: 修改描述文本
@@ -127,40 +137,134 @@ def llm_judge(changes_text: str, plan_summary: str,
     Returns:
         检查结果
     """
-    # 这里简化为基于关键词的启发式判断
-    # 实际应用中可以调用 LLM API 进行语义理解
-    
-    # 构建完整文本
-    full_text = f"{changes_text} {plan_summary} {' '.join(affected_files)}"
-    
-    # 检查是否涉及多个文件（可能影响架构）
-    if len(affected_files) > 5:
+    # 检查 SDK 可用性
+    if not COZE_SDK_AVAILABLE:
         return ModificationCheckOutput(
-            action="ROLLBACK_TO_PLAN",
-            modification_type="arch_change",
-            reason=f"涉及文件较多 ({len(affected_files)} 个)，可能影响架构",
-            confidence=0.7,
-            suggested_fix="请评估修改范围，必要时回到 Plan 阶段"
+            action="ASK_USER",
+            modification_type="unknown",
+            reason="LLM SDK 未安装或不可用",
+            confidence=0.3,
+            suggested_fix="移除 --use-llm 参数，使用规则检查（默认）"
         )
     
-    # 检查是否涉及核心模块
-    core_keywords = ["core", "main", "app", "index", "init", "base"]
-    if any(kw in full_text.lower() for kw in core_keywords):
-        return ModificationCheckOutput(
-            action="ROLLBACK_TO_PLAN",
-            modification_type="arch_change",
-            reason="可能涉及核心模块",
-            confidence=0.6,
-            suggested_fix="请评估对核心模块的影响"
+    # 构建 LLM 请求
+    prompt = f"""你是一个代码架构专家。请判断以下代码修改是"架构变更"还是"实现细节"。
+
+## 修改描述
+{changes_text}
+
+## 原计划摘要
+{plan_summary if plan_summary else "无"}
+
+## 受影响文件
+{', '.join(affected_files) if affected_files else "无"}
+
+## 判断标准
+- 架构变更：涉及节点数量变化、连接关系变化、状态结构变化、数据流契约变化、外部集成
+- 实现细节：函数内部优化、变量命名、注释格式、配置参数、代码格式
+
+## 输出格式（JSON）
+{{"type": "arch_change|impl_detail|unknown", "reason": "判断理由", "confidence": 0.0-1.0}}
+
+请只输出 JSON，不要其他内容。"""
+
+    try:
+        # 调用平台 LLM API
+        response = requests.post(
+            "https://api.coze.cn/v1/chat",
+            headers={
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "default",
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False
+            },
+            timeout=30
         )
-    
-    # 默认情况
-    return ModificationCheckOutput(
-        action="CONTINUE",
-        modification_type="impl_detail",
-        reason="未检测到明显的架构变更",
-        confidence=0.5
-    )
+        
+        if response.status_code >= 400:
+            return ModificationCheckOutput(
+                action="ASK_USER",
+                modification_type="unknown",
+                reason=f"LLM API 调用失败: HTTP {response.status_code}",
+                confidence=0.3,
+                suggested_fix="请人工判断修改类型"
+            )
+        
+        # 解析响应
+        data = response.json()
+        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+        
+        # 提取 JSON
+        import re
+        json_match = re.search(r'\{[^}]+\}', content)
+        if not json_match:
+            return ModificationCheckOutput(
+                action="ASK_USER",
+                modification_type="unknown",
+                reason="LLM 返回格式异常",
+                confidence=0.3,
+                suggested_fix="请人工判断修改类型"
+            )
+        
+        result = json.loads(json_match.group())
+        mod_type = result.get("type", "unknown")
+        reason = result.get("reason", "LLM 判断")
+        confidence = result.get("confidence", 0.5)
+        
+        # 映射到决策
+        if mod_type == "arch_change":
+            return ModificationCheckOutput(
+                action="ROLLBACK_TO_PLAN",
+                modification_type="arch_change",
+                reason=f"LLM 判断为架构变更: {reason}",
+                confidence=confidence,
+                suggested_fix="请回到 Plan 阶段，更新架构设计"
+            )
+        elif mod_type == "impl_detail":
+            return ModificationCheckOutput(
+                action="CONTINUE",
+                modification_type="impl_detail",
+                reason=f"LLM 判断为实现细节: {reason}",
+                confidence=confidence
+            )
+        else:
+            return ModificationCheckOutput(
+                action="ASK_USER",
+                modification_type="unknown",
+                reason=f"LLM 无法确定: {reason}",
+                confidence=confidence,
+                suggested_fix="请人工确认修改类型"
+            )
+            
+    except json.JSONDecodeError:
+        return ModificationCheckOutput(
+            action="ASK_USER",
+            modification_type="unknown",
+            reason="LLM 响应解析失败",
+            confidence=0.3,
+            suggested_fix="请人工判断修改类型，或移除 --use-llm 使用规则检查"
+        )
+    except Exception as e:
+        error_msg = str(e)
+        # 针对常见错误提供更友好的提示
+        if "COZE_OUTBOUND_AUTH_PROXY" in error_msg:
+            friendly_msg = "平台 LLM 服务未配置（需要在平台环境中运行）"
+        elif "timeout" in error_msg.lower():
+            friendly_msg = "LLM 请求超时"
+        elif "connection" in error_msg.lower():
+            friendly_msg = "LLM 服务连接失败"
+        else:
+            friendly_msg = f"LLM 调用异常: {error_msg}"
+        
+        return ModificationCheckOutput(
+            action="ASK_USER",
+            modification_type="unknown",
+            reason=friendly_msg,
+            confidence=0.3,
+            suggested_fix="请人工判断修改类型，或移除 --use-llm 使用规则检查"
+        )
 
 
 def main():

@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - Context Orchestrator（上下文编排器）
 
@@ -26,7 +45,7 @@ from typing import Any, Callable
 
 from pydantic import BaseModel, Field
 
-from .types import SemanticBucketType, MemoryCategory
+from .type_defs import SemanticBucketType, MemoryCategory
 from .redis_adapter import RedisAdapter, RedisConfig, create_redis_adapter
 from .short_term_redis import ShortTermMemoryRedis, ShortTermRedisConfig
 from .token_budget import (
@@ -234,8 +253,24 @@ class ContextOrchestrator:
             ),
         )
 
+        # 【新增】长期记忆管理器（可选）
+        self._long_term: Any | None = None
+
         # 注册的内容提供者
         self._providers: dict[str, Callable[[], list[ContextBlock]]] = {}
+
+    # -----------------------------------------------------------------------
+    # 长期记忆绑定
+    # -----------------------------------------------------------------------
+
+    def bind_long_term(self, long_term: Any) -> None:
+        """
+        绑定长期记忆管理器
+
+        Args:
+            long_term: LongTermMemoryManager 实例
+        """
+        self._long_term = long_term
 
     # -----------------------------------------------------------------------
     # 提供者注册
@@ -700,6 +735,151 @@ class ContextOrchestrator:
             会话统计
         """
         return self._token_budget.end_session()
+
+    # ========================================================================
+    # 【新增】测试支持方法
+    # ========================================================================
+
+    def select_relevant_memories(
+        self,
+        query: str,
+        top_k: int = 5,
+    ) -> list[dict[str, Any]]:
+        """
+        智能选择相关记忆
+
+        Args:
+            query: 查询文本
+            top_k: 返回数量
+
+        Returns:
+            相关记忆列表
+        """
+        # 从短期记忆检索
+        stm_results = self._short_term.search(query, limit=top_k)
+
+        # 转换为统一格式
+        memories: list[dict[str, Any]] = []
+        for item in stm_results:
+            memories.append({
+                "memory_id": item.item_id,
+                "content": item.content,
+                "bucket_type": item.bucket_type.value,
+                "relevance_score": item.relevance_score,
+                "source": "short_term",
+            })
+
+        return memories[:top_k]
+
+    def get_hot_memories(
+        self,
+        limit: int = 3,
+    ) -> list[dict[str, Any]]:
+        """
+        获取热数据（短期记忆中的高相关性记忆）
+
+        Args:
+            limit: 返回数量
+
+        Returns:
+            热数据列表
+        """
+        all_items: list[dict[str, Any]] = []
+
+        # 从所有桶中获取高相关性记忆
+        for bucket_type in [
+            SemanticBucketType.TASK_CONTEXT,
+            SemanticBucketType.DECISION_CONTEXT,
+            SemanticBucketType.USER_INTENT,
+        ]:
+            bucket = self._short_term.get_bucket(bucket_type)
+            if bucket:
+                # bucket 可能是 dict 类型（来自 short_term_redis）
+                if isinstance(bucket, dict):
+                    items = bucket.get("items", [])
+                else:
+                    # bucket 是 SemanticBucket 类型（来自 short_term）
+                    items = bucket.get_items(limit=limit)
+
+                for item in items:
+                    # 检查 relevance_score
+                    relevance_score = getattr(item, 'relevance_score', 0)
+                    if relevance_score >= 0.7:
+                        all_items.append({
+                            "memory_id": getattr(item, 'item_id', ''),
+                            "content": getattr(item, 'content', ''),
+                            "bucket_type": bucket_type.value,
+                            "relevance_score": relevance_score,
+                            "created_at": getattr(item, 'created_at', '').isoformat() if hasattr(getattr(item, 'created_at', None), 'isoformat') else None,
+                            "source": "short_term",
+                        })
+
+        # 按相关性排序并返回
+        all_items.sort(key=lambda x: x["relevance_score"], reverse=True)
+        return all_items[:limit]
+
+    def get_cold_memories(
+        self,
+        limit: int = 3,
+    ) -> list[dict[str, Any]]:
+        """
+        获取冷数据（长期记忆）
+
+        Args:
+            limit: 返回数量
+
+        Returns:
+            冷数据列表
+        """
+        # 从长期记忆获取
+        if self._long_term:
+            # 获取各类长期记忆
+            memories: list[dict[str, Any]] = []
+
+            # 用户画像
+            profile = self._long_term.get_user_profile()
+            if profile:
+                memories.append({
+                    "memory_id": profile.profile_id if hasattr(profile, 'profile_id') else "user_profile",
+                    "content": str(profile.identity if profile else ""),
+                    "category": "user_profile",
+                    "relevance_score": 0.6,
+                    "source": "long_term",
+                })
+
+            # 程序性记忆
+            procedural = self._long_term.get_procedural_memory()
+            if procedural and procedural.decision_patterns:
+                for pattern in procedural.decision_patterns[:limit]:
+                    memories.append({
+                        "memory_id": pattern.pattern_id,
+                        "content": f"{pattern.scenario}: {pattern.decision}",
+                        "category": "procedural",
+                        "relevance_score": pattern.success_rate,
+                        "source": "long_term",
+                    })
+
+            return memories[:limit]
+
+        return []
+
+    def get_used_tokens(self) -> int:
+        """
+        获取已使用的 Token 数
+
+        Returns:
+            已使用 Token 数
+        """
+        return self._token_budget.get_used_tokens()
+
+    def get_remaining_tokens(self) -> int:
+        """
+        获取剩余 Token 数
+
+        Returns:
+            剩余 Token 数
+        """
+        return self._token_budget.get_remaining_tokens()
 
 
 # ============================================================================

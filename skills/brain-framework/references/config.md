@@ -47,6 +47,15 @@ brain_framework:
     auto_run_tests: true         # 自动运行测试
     max_retry_on_failure: 3      # 失败重试次数
   
+  # 类型安全约束
+  type_safety:
+    require_type_hints: true     # 要求所有函数有类型注解
+    runtime_validation: "pydantic"  # 使用 Pydantic 运行时验证
+    forbid_implicit_conversion: true  # 禁止隐式类型转换
+    explicit_none_check: true    # 要求显式 None 检查（区分 None/""/[]/0/False）
+    unified_dict_key_type: true  # 要求字典键类型统一
+    deep_copy_for_nested: true   # 嵌套结构使用深拷贝
+  
   # 持久化配置
   persistence:
     output_dir: "./brain_output"
@@ -101,6 +110,36 @@ brain_framework:
 - 类型: Integer
 - 默认值: 3
 - 说明: 失败时的最大重试次数
+
+### brain_framework.type_safety.require_type_hints
+- 类型: Boolean
+- 默认值: true
+- 说明: 是否要求所有函数都有类型注解
+
+### brain_framework.type_safety.runtime_validation
+- 类型: String
+- 默认值: "pydantic"
+- 说明: 运行时类型验证工具，可选 "pydantic" 或 "none"
+
+### brain_framework.type_safety.forbid_implicit_conversion
+- 类型: Boolean
+- 默认值: true
+- 说明: 是否禁止隐式类型转换（如 `"5" + 3`）
+
+### brain_framework.type_safety.explicit_none_check
+- 类型: Boolean
+- 默认值: true
+- 说明: 是否要求显式区分 None/""/[]/0/False
+
+### brain_framework.type_safety.unified_dict_key_type
+- 类型: Boolean
+- 默认值: true
+- 说明: 是否要求字典键类型统一（如 `{"1": "a", 1: "b"}` 禁止）
+
+### brain_framework.type_safety.deep_copy_for_nested
+- 类型: Boolean
+- 默认值: true
+- 说明: 嵌套结构是否强制使用深拷贝
 
 ### brain_framework.persistence.output_dir
 - 类型: String

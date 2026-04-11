@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 短期记忆 Redis 存储
 
@@ -29,7 +48,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .types import SemanticBucketType
+from .type_defs import SemanticBucketType
 from .redis_adapter import RedisAdapter, RedisConfig, create_redis_adapter, REDIS_AVAILABLE
 
 
@@ -598,6 +617,63 @@ class ShortTermMemoryRedis:
                 removed += 1
 
         return removed
+
+    # ========================================================================
+    # 【新增】测试支持方法
+    # ========================================================================
+
+    def search(
+        self,
+        query: str,
+        limit: int = 10,
+    ) -> list[ShortTermMemoryItemRedis]:
+        """
+        搜索记忆项
+
+        Args:
+            query: 搜索关键词
+            limit: 返回数量限制
+
+        Returns:
+            匹配的记忆项列表
+        """
+        results: list[ShortTermMemoryItemRedis] = []
+        query_lower = query.lower()
+
+        # 获取所有记忆项
+        all_items = self.get_all(limit=limit * 2)  # 多取一些，后续过滤
+
+        # 简单的关键词匹配
+        for item in all_items:
+            if query_lower in item.content.lower():
+                results.append(item)
+                if len(results) >= limit:
+                    break
+
+        return results
+
+    def get_bucket(
+        self,
+        bucket_type: SemanticBucketType,
+    ) -> dict[str, Any] | None:
+        """
+        获取指定类型的桶信息
+
+        Args:
+            bucket_type: 语义桶类型
+
+        Returns:
+            桶信息字典（模拟语义桶）
+        """
+        # 获取该类型的所有记忆项
+        items = self.get_by_bucket(bucket_type, limit=1000)
+
+        # 返回模拟的桶信息
+        return {
+            "bucket_type": bucket_type,
+            "items": items,
+            "count": len(items),
+        }
 
 
 # ============================================================================

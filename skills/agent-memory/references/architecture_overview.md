@@ -2,6 +2,8 @@
 
 本文档提供 Agent Memory System 的全局架构视角，用于理解系统整体设计、模块协作关系和核心数据流。
 
+> **⚠️ 重要**：在阅读本文档前，请先阅读 [执行模型说明](architecture_execution_model.md)，了解系统的运行方式、触发场景和使用时机。
+
 ## 目录
 
 1. [系统定位与核心能力](#一系统定位与核心能力)
@@ -14,6 +16,12 @@
 8. [洞察类型体系](#八洞察类型体系)
 9. [模块连接优先级](#九模块连接优先级)
 10. [性能指标](#十性能指标)
+11. [认知模型层架构](#十一认知模型层架构)
+12. [上下文来源优先级](#十二上下文来源优先级)
+13. [检索决策流程](#十三检索决策流程)
+14. [记忆演化机制](#十四记忆演化机制)
+15. [敏感信息类型](#十五敏感信息类型)
+16. [性能指标](#十六性能指标)
 
 ---
 
@@ -21,7 +29,7 @@
 
 ### 定位
 
-Agent Memory System 是**智能体一切行为的底层记忆基础设施**，作为元技能强制常驻运行（`always: true`）。
+Agent Memory System 是**智能体一切行为的底层记忆基础设施**，作为元技能常驻运行（`always: true`）。
 
 ### 核心能力矩阵
 
@@ -416,21 +424,11 @@ ACTIVE（活跃）──▶ PENDING（待处理）──▶ ARCHIVED（归档）
 | 状态同步 | < 10ms | LangGraph 集成 |
 | 端到端同步路径 | < 200ms | 完整流程 |
 
----
 
-## 相关文档
 
-- [memory_types.md](memory_types.md) - 记忆类型详解
-- [activation_mechanism.md](activation_mechanism.md) - 激活器机制
-- [insight_design.md](insight_design.md) - 洞察模块设计
-- [short_term_insight_guide.md](short_term_insight_guide.md) - 短期记忆洞察指南
-- [agent_loops_guide.md](agent_loops_guide.md) - Agent Loop 架构演进
+## 十一、认知模型层级架构（Part 3 新增）
 
----
-
-## 十一、认知模型层架构（Part 3 新增）
-
-### 分层架构
+### 层级分层架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -658,3 +656,18 @@ ACTIVE（活跃）──▶ PENDING（待处理）──▶ ARCHIVED（归档）
 | **跨会话关联** | < 20ms | 图谱查询 |
 | **遗忘分析** | < 10ms | 批量分析 |
 | 端到端同步路径 | < 200ms | 完整流程 |
+
+
+---
+
+## 相关文档
+
+- [memory_types.md](memory_types.md) - 记忆类型详解
+- [activation_mechanism.md](activation_mechanism.md) - 激活器机制
+- [insight_design.md](insight_design.md) - 洞察模块设计
+- [short_term_insight_guide.md](short_term_insight_guide.md) - 短期记忆洞察指南
+- [agent_loops_integration.md](agent_loops_integration.md) - Agent Loop 集成指南
+- [agent_loops_advanced.md](agent_loops_advanced.md) - Agent Loop 架构演进
+- [chain_reasoning_guide.md](chain_reasoning_guide.md) - 链式推理增强模块
+
+---

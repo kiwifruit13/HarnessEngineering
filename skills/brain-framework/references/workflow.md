@@ -6,6 +6,9 @@
 3. [分支流程](#分支流程)
 4. [常见场景](#常见场景)
 5. [最佳实践](#最佳实践)
+6. [核心工作原则](#核心工作原则)
+7. [类型安全最佳实践](#类型安全最佳实践)
+8. [故障排查](#故障排查)
 
 ## 流程概览
 
@@ -318,6 +321,177 @@ Implement（快速修复）
 - **文档即共享状态**: 所有中间结果都持久化
 - **小步快跑**: 避免大规模一次性变更
 - **测试驱动**: 每次修改后验证
+
+## 核心工作原则
+
+### 规划触发条件
+- **涉及 3 步以上或包含设计决策的任务，必须进入 Plan 阶段**
+- 在 Research 完成后（或跳过 Research），作为"是否需要详细规划"的判断条件
+- 复杂任务在 Plan 阶段生成完整计划，简单任务可直接进入 Annotate
+- **判断标准**：
+  - 修改涉及 3 个以上文件 → 必须规划
+  - 涉及架构调整 → 必须规划
+  - 包含技术选型决策 → 必须规划
+  - 仅 1-2 个文件的简单修改 → 可跳过规划
+
+### 问题处理原则
+- **遇到问题不要强行推进，立即停止并重新规划**
+- 这是 Implement 阶段的核心原则
+- 当 `implement.py` 执行遇到错误，或 `modification_check.py` 返回 ROLLBACK 时：
+  1. 立即停止当前实施
+  2. 记录问题详情
+  3. 回退到 Plan 阶段重新设计
+- **禁止行为**：尝试绕过问题、降级处理、忽略警告
+
+### 验证规划要求
+- **验证阶段也要使用规划模式**
+- 验证不是独立阶段，而是 Plan 阶段的一部分
+- 在 `plan.md` 中应包含"验证策略"章节：
+  - 测试用例清单
+  - 验证标准（通过条件）
+  - 回滚条件（失败时如何处理）
+  - 边界条件测试
+- **验证策略示例**：
+  ```markdown
+  ## 验证策略
+  - 单元测试: 运行 pytest，覆盖率 ≥ 80%
+  - 类型检查: mypy --strict 无错误
+  - 集成测试: 验证 API 响应格式正确
+  - 回滚条件: 任一测试失败则回退到 Plan 阶段
+  ```
+
+### 规范先行原则
+- **开始前先写详细规范，减少歧义**
+- Research 阶段输出应包含：
+  - 需求澄清（用户真正想要什么）
+  - 边界定义（做什么、不做什么）
+  - 约束条件（技术限制、时间限制）
+- 详细规范是 Research 的产出物，Plan 的约束条件
+- **规范文档模板**：
+  ```markdown
+  ## 需求规范
+  - 目标: [明确的目标描述]
+  - 输入: [预期的输入格式和来源]
+  - 输出: [预期的输出格式和去向]
+  - 约束: [技术/时间/资源限制]
+  - 不包含: [明确排除的内容]
+  ```
+
+## 类型安全最佳实践
+
+### 弱类型陷阱及应对
+
+#### 1. 隐式类型转换
+**问题示例**：
+```python
+# Python (强类型，会报错)
+"5" + 3  # TypeError
+
+# JavaScript (弱类型，静默转换)
+"5" + 3  # "53"
+"5" - 3  # 2
+[] == false  # true
+```
+
+**应对措施**：
+- 使用严格相等 `===` 而非 `==`（JavaScript）
+- 启用 TypeScript/Pylint 等静态检查工具
+- 在 Plan 阶段明确类型约束
+
+#### 2. 空值歧义
+**问题示例**：
+```python
+# None vs "" vs [] vs 0 vs False —— 都能表示"无"，但语义不同
+if not data:  # 这5种值都会进入分支，但可能需要区分处理
+    pass
+
+# 默认参数陷阱
+def append_item(item, lst=[]):  # 可变默认参数被共享
+    lst.append(item)
+    return lst
+```
+
+**应对措施**：
+```python
+# 显式区分
+if data is None:      # 明确检查 None
+if data == "":        # 明确检查空字符串
+if not data:          # 通用的"falsy"检查（需文档说明意图）
+
+# 使用 sentinel 值
+_SENTINEL = object()
+def func(value=_SENTINEL):
+    if value is _SENTINEL:
+        # 真正的"未提供参数"
+```
+
+#### 3. 类型推断失效
+**问题示例**：
+```python
+# Python 类型注解只是提示，运行时不强制
+def process(data: list[str]) -> str:
+    return data[0]
+
+process([1, 2, 3])  # 运行正常，但类型错误
+```
+
+**应对措施**：
+- Implement 阶段启用 `--strict` 模式
+- 使用 `mypy --strict` 或 `pyright` 进行静态类型检查
+- 在 Plan 阶段的"文件变更清单"中标注类型约束
+
+#### 4. 容器类型陷阱
+**问题示例**：
+```python
+# 字典键类型混合
+d = {"1": "a", 1: "b"}  # 允许，但容易混淆
+
+# 列表浅拷贝
+a = [[1, 2], [3, 4]]
+b = a[:]
+b[0][0] = 999  # a[0][0] 也变成 999
+```
+
+**应对措施**：
+- 统一字典键类型，使用 `TypedDict` 或 `dataclass`
+- 深拷贝使用 `copy.deepcopy()` 或 `json.loads(json.dumps(obj))`
+- 在 Research 阶段识别这类风险点
+
+### 类型安全代码规范
+
+```python
+# 1. 使用类型注解 + 静态检查
+from typing import Optional, List, Dict, Any
+
+def process(data: List[str], config: Optional[Dict[str, Any]] = None) -> str:
+    if config is None:
+        config = {}
+    # ...
+
+# 2. 使用 Pydantic 进行运行时验证
+from pydantic import BaseModel
+
+class Config(BaseModel):
+    timeout: int
+    retries: int = 3
+
+# 3. 避免 any，使用更精确的类型
+# 错误
+def parse(data: Any) -> Any: ...
+
+# 正确
+def parse(data: str | dict) -> dict: ...
+```
+
+### 各阶段类型安全检查点
+
+| 阶段 | 类型安全职责 |
+|------|-------------|
+| **Research** | 识别类型热点：隐式转换、any 类型、混合类型容器 |
+| **Plan** | 明确类型策略：是否启用严格模式、类型注解覆盖率目标 |
+| **Annotate** | 审查类型边界：函数签名、接口契约、序列化格式 |
+| **Implement** | `--strict` 模式强制类型检查，禁止 `any`/`unknown` |
+| **Modification Check** | 检测类型签名变更：新增 `Optional`、改变返回类型 |
 
 ## 故障排查
 

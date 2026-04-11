@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 全局状态捕捉器（LangGraph集成版）
 
@@ -28,7 +47,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable
 
-from .types import (
+from .type_defs import (
     CheckpointRecord,
     StateChangeEvent,
     StateEventType,
@@ -1036,3 +1055,84 @@ class GlobalStateCapture:
             "timestamp": state["timestamp"],
             "state": state,
         }
+
+    # ========================================================================
+    # 【新增】测试支持方法
+    # ========================================================================
+
+    def track_event(
+        self,
+        event_type: str,
+        event_data: dict[str, Any],
+    ) -> None:
+        """
+        追踪事件
+
+        Args:
+            event_type: 事件类型
+            event_data: 事件数据
+        """
+        event: StateChangeEvent = StateChangeEvent(
+            event_id=f"evt_{uuid.uuid4().hex[:8]}",
+            event_type=StateEventType.USER_STATE_CHANGE,  # 使用正确的属性名
+            checkpoint_id="",  # 一般事件追踪不需要检查点ID
+            thread_id="",
+            current_state=event_data,
+            previous_state={},
+        )
+        self._event_bus.emit(event)
+
+    def capture_snapshot(self, state: dict[str, Any]) -> dict[str, Any]:
+        """
+        捕获状态快照
+
+        Args:
+            state: 状态字典
+
+        Returns:
+            快照字典
+        """
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "state": state.copy(),
+            "checkpoint_id": self.create_checkpoint(
+                state=state,
+                thread_id="snapshot",
+                node_name="snapshot",
+            ),
+        }
+
+    def compare_states(
+        self,
+        state1: dict[str, Any],
+        state2: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """
+        比较两个状态的差异
+
+        Args:
+            state1: 第一个状态
+            state2: 第二个状态
+
+        Returns:
+            差异列表
+        """
+        diffs: list[dict[str, Any]] = []
+
+        # 检查所有键
+        all_keys: set[str] = set(state1.keys()) | set(state2.keys())
+
+        for key in all_keys:
+            value1: Any = state1.get(key)
+            value2: Any = state2.get(key)
+
+            if value1 != value2:
+                diffs.append({
+                    "key": key,
+                    "old_value": value1,
+                    "new_value": value2,
+                    "changed": True,
+                })
+
+        return diffs
+

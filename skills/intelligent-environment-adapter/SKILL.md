@@ -8,144 +8,79 @@ dependency:
 
 # 智能环境适配器
 
-## 任务目标
-- 本 Skill 用于：分析用户任务特征，评估当前skills与任务需求的匹配度，识别能力短板，设计最优技能编排方案
-- 能力包含：环境感知、能力映射、短板诊断、补齐决策、编排规划、技能组合、执行监控、动态调整
-- 触发条件：智能体处理复杂任务前、发现任务需要特定领域知识、需要评估当前能力是否充足
+## 快速开始
 
----
+本 Skill 提供智能化的技能编排方案生成能力，包含14个功能模块，支持标准编排、动态调整、LangGraph集成、智能补全闭环等场景。
 
-## 模块化架构
+**核心能力**：
+- 环境感知 → 能力映射 → 短板诊断 → 智能补全推荐 → 编排规划 → 技能组合
+- 执行监控 → 动态调整 → 实时优化
+- LangGraph 深度集成（状态捕获 + 实时分析）
+- ClawHub 候补技能源（Coze 优先，ClawHub 候补）
+- 完整闭环（诊断 → 推荐 → 实施 → 评估 → 学习）
 
-本适配器采用**模块化设计**，共包含8个独立模块，职责明确、边界清晰。
-
-### 模块列表
-
-| 模块 | 名称 | 职责 | 边界 |
-|------|------|------|------|
-| **A** | 环境感知 | 分析任务特征，生成环境画像 | 不涉及能力评估 |
-| **B** | 能力映射 | 计算匹配度，识别能力断点 | 不生成诊断报告 |
-| **C** | 短板诊断 | 生成详细诊断报告 | 不选择补齐策略 |
-| **D** | 补齐决策 | 选择补齐策略，生成计划 | 不涉及编排规划 |
-| **E** | 编排规划 | 设计技能编排方案 | 不涉及技能匹配 |
-| **F** | 技能组合 | 生成可执行的技能组合 | 不执行 |
-| **G** | 执行监控 | 接收执行状态，判断调整需求 | 不执行调整 |
-| **H** | 动态调整 | 生成调整方案 | 不执行调整 |
-
-### 核心原则
-
-```
-原则1：单一职责 - 每个模块只做一件事
-原则2：明确边界 - 模块间通过数据文件交互
-原则3：无交叉调用 - 模块间不直接调用
-原则4：只输出方案 - 所有模块只输出建议，不执行
-```
-
----
-
-## 数据流
-
-```
-任务描述
-    ↓
-[模块A] 环境感知 → environment_profile.json
-    ↓
-[模块B] 能力映射 → mapping_result.json
-    ↓
-[模块C] 短板诊断 → diagnostic_report.json
-    ↓
-[模块D] 补齐决策 → remediation_plan.json
-    ↓
-[模块E] 编排规划 → orchestration_plan.json
-    ↓
-[模块F] 技能组合 → orchestration_result.json
-    ↓
-    输出给智能体
-    ↓
-智能体执行 → execution_status.json
-    ↓
-[模块G] 执行监控 → adjustment_suggestion.json
-    ↓
-[模块H] 动态调整 → adjustment_plan.json
-    ↓
-    输出给智能体继续执行
-```
-
----
-
-## 前置准备
-- 依赖说明：本 Skill 的脚本仅使用 Python 标准库（json, typing, argparse, pathlib），无需额外安装
-- 非标准文件/文件夹准备：无
+详见：[全局概览文档](references/overview.md)
 
 ---
 
 ## 操作步骤
 
-### 标准流程（初次编排）
+### 标准编排流程
 
-#### 1. 环境感知（模块A）
 ```bash
+# 1. 环境感知（模块A）
 python scripts/modules/environment_perceiver.py \
     --task-description "分析2025年AI法律监管政策趋势" \
     --output environment_profile.json
-```
 
-#### 2. 能力映射（模块B）
-```bash
+# 2. 能力映射（模块B）
 python scripts/modules/capability_mapper.py \
     --environment-profile environment_profile.json \
     --capability-registry capability_registry.json \
     --output mapping_result.json
-```
 
-#### 3. 短板诊断（模块C）
-```bash
+# 3. 短板诊断（模块C）
 python scripts/modules/shortage_diagnoser.py \
     --mapping-result mapping_result.json \
     --environment-profile environment_profile.json \
     --output diagnostic_report.json
-```
 
-#### 4. 补齐决策（模块D）
-```bash
+# 4. 智能补全推荐（模块M，推荐使用）
+python scripts/modules/intelligent_remedy_recommender.py \
+    --diagnostic-report diagnostic_report.json \
+    --environment-profile environment_profile.json \
+    --learning-db learning_database.json \
+    --output remedy_recommendations.json
+
+# 5. 补齐决策（模块D，可选）
 python scripts/modules/remediation_decider.py \
     --diagnostic-report diagnostic_report.json \
     --environment-profile environment_profile.json \
     --output remediation_plan.json
-```
 
-#### 5. 编排规划（模块E）
-```bash
+# 6. 编排规划（模块E）
 python scripts/modules/orchestration_planner.py \
     --remediation-plan remediation_plan.json \
     --environment-profile environment_profile.json \
     --output orchestration_plan.json
-```
 
-#### 6. 技能组合（模块F）
-```bash
+# 7. 技能组合（模块F）
 python scripts/modules/skill_composer.py \
     --orchestration-plan orchestration_plan.json \
     --available-skills available_skills.json \
     --output orchestration_result.json
 ```
 
----
+### 动态调整流程
 
-### 动态调整流程（执行中）
-
-当智能体执行编排方案遇到问题时：
-
-#### 1. 执行监控（模块G）
 ```bash
+# 1. 执行监控（模块G）
 python scripts/modules/execution_monitor.py \
     --execution-status execution_status.json \
     --orchestration-plan orchestration_plan.json \
     --output adjustment_suggestion.json
-```
 
-#### 2. 动态调整（模块H）
-```bash
+# 2. 动态调整（模块H）
 python scripts/modules/dynamic_adjuster.py \
     --execution-status execution_status.json \
     --adjustment-suggestion adjustment_suggestion.json \
@@ -153,137 +88,170 @@ python scripts/modules/dynamic_adjuster.py \
     --output adjustment_plan.json
 ```
 
-#### 3. 回溯处理（如需要）
+### LangGraph 集成
 
-如果模块H输出 `revisit_request`，智能体可以决定是否回溯：
+```python
+from scripts.modules.state_capture_adapter import StateCaptureAdapter
+from scripts.modules.realtime_coordinator import RealtimeCoordinator
 
-```json
-{
-  "revisit_request": {
-    "action": "revisit_diagnosis",
-    "target_module": "shortage_diagnosis",
-    "reason": "发现新的能力短板"
-  }
-}
+# 初始化
+state_adapter = StateCaptureAdapter()
+coordinator = RealtimeCoordinator()
+
+# 在 LangGraph 节点中
+def realtime_check_node(state):
+    # 实时分析
+    result = coordinator.analyze_realtime(
+        langgraph_state=state,
+        current_node=state["current_node"],
+        node_history=state.get("node_history", []),
+        orchestration_plan=state.get("orchestration_plan")
+    )
+
+    if result.needs_adjustment:
+        return {"adjustment_plan": result.adjustment_plan}
+
+    return {"no_adjustment": True}
 ```
 
-智能体执行回溯：
-```bash
-# 重新调用模块C
-python scripts/modules/shortage_diagnoser.py \
-    --mapping-result mapping_result.json \
-    --environment-profile environment_profile.json \
-    --previous-diagnostic previous_diagnostic.json \
-    --output updated_diagnostic.json
+### 技能查询（Coze + ClawHub 建议生成）
+
+```python
+from scripts.modules.skill_query_coordinator import SkillQueryCoordinator
+from scripts.modules.clawhub_querier import ClawHubQuerySuggester
+
+# 创建协调器
+coordinator = SkillQueryCoordinator()
+
+# 创建 ClawHub 查询建议生成器（仅生成方案，不执行 API）
+clawhub_suggester = ClawHubQuerySuggester()
+
+# 生成 ClawHub 查询建议
+suggestion = clawhub_suggester.generate_query_suggestion(
+    capability_tags=["数据分析", "可视化"],
+    domain="金融"
+)
+
+# 将建议转换为模型可执行的指导
+guidance = clawhub_suggester.convert_to_model_guidance(suggestion)
+# guidance 包含：
+# - 建议的查询参数（tags, keywords, filters）
+# - 本地候补方案
+# - 替代搜索建议
+```
+
+### 智能补全推荐
+
+```python
+from scripts.modules.intelligent_remedy_recommender import IntelligentRemedyRecommender
+
+# 创建推荐器
+recommender = IntelligentRemedyRecommender()
+recommender.set_skill_query_coordinator(coordinator)
+
+# 生成补全推荐
+recommendations = recommender.generate_remedy_recommendations(
+    diagnostic_report=diagnostic_report,
+    environment_profile=environment_profile,
+    strategy="balanced"
+)
+
+# 查看方案
+primary = recommendations['recommendations']['primary_plan']
+print(f"预期改善: {primary['expected_improvement']:.1%}")
+```
+
+### 效果评估
+
+```python
+from scripts.modules.remediation_effectiveness_evaluator import RemediationEffectivenessEvaluator
+
+# 创建评估器
+evaluator = RemediationEffectivenessEvaluator()
+evaluator.load_lessons_database("lessons_database.json")
+
+# 评估效果
+evaluation = evaluator.evaluate_effectiveness(
+    pre_remediation_state={"match_score": 0.60},
+    post_remediation_state={"match_score": 0.85},
+    remedy_plan=remedy_recommendations,
+    execution_result={"status": "success"}
+)
+
+print(f"综合效果: {evaluation['effectiveness_metrics']['overall_effectiveness']:.2f}")
 ```
 
 ---
 
-## 可选分支
+## 模块索引
 
-- **匹配度 >= 0.85**：直接输出基础编排方案
-- **0.60 <= 匹配度 < 0.85**：生成完整编排方案 + 补齐建议
-- **匹配度 < 0.60**：输出降级方案或建议重新定义任务
+| 模块 | 名称 | 文件 | 用途 |
+|------|------|------|------|
+| **A** | 环境感知 | `environment_perceiver.py` | 分析任务特征 |
+| **B** | 能力映射 | `capability_mapper.py` | 计算匹配度 |
+| **C** | 短板诊断 | `shortage_diagnoser.py` | 生成诊断报告 |
+| **M** | 智能补全推荐 | `intelligent_remedy_recommender.py` | 智能匹配技能 |
+| **D** | 补齐决策 | `remediation_decider.py` | 选择补齐策略 |
+| **E** | 编排规划 | `orchestration_planner.py` | 设计编排方案 |
+| **F** | 技能组合 | `skill_composer.py` | 生成技能组合 |
+| **G** | 执行监控 | `execution_monitor.py` | 监控执行状态 |
+| **H** | 动态调整 | `dynamic_adjuster.py` | 生成调整方案 |
+| **I** | 状态捕获 | `state_capture_adapter.py` | 捕获 LangGraph 状态 |
+| **J** | 实时协调 | `realtime_coordinator.py` | 实时分析优化 |
+| **K** | ClawHub查询建议 | `clawhub_querier.py` | 生成 ClawHub 查询方案（不执行API） |
+| **L** | 技能查询协调 | `skill_query_coordinator.py` | 协调多源查询 |
+| **N** | 效果评估 | `remediation_effectiveness_evaluator.py` | 评估补全效果 |
 
 ---
 
 ## 资源索引
 
 ### 模块脚本
-- `scripts/modules/environment_perceiver.py`：模块A - 环境感知
-- `scripts/modules/capability_mapper.py`：模块B - 能力映射
-- `scripts/modules/shortage_diagnoser.py`：模块C - 短板诊断
-- `scripts/modules/remediation_decider.py`：模块D - 补齐决策
-- `scripts/modules/orchestration_planner.py`：模块E - 编排规划
-- `scripts/modules/skill_composer.py`：模块F - 技能组合
-- `scripts/modules/execution_monitor.py`：模块G - 执行监控
-- `scripts/modules/dynamic_adjuster.py`：模块H - 动态调整
+所有模块位于 `scripts/modules/` 目录，详见上方模块索引。
 
 ### 工具脚本
 - `scripts/utils/validator.py`：数据格式验证
 - `scripts/utils/loader.py`：数据加载器
 
-### 领域参考
-- `references/module_specs/overview.md`：模块规范概览
+### 参考文档
+- `references/overview.md`：全局概览文档（知识图谱）
 - `references/capability_layers.md`：五层能力模型
-- `references/remediation_strategies.md`：补齐策略说明
 - `references/data_formats.md`：数据格式规范
+- `references/remediation_strategies.md`：补齐策略说明
 - `references/orchestration_patterns.md`：编排模式参考
+- `references/module_specs/overview.md`：模块规范概览
+
+---
+
+## 前置准备
+
+- **依赖**：仅使用 Python 标准库（json, typing, argparse, pathlib, datetime, dataclasses）
+- **数据文件**：需要准备 `capability_registry.json`（能力清单）
+- **可选**：`learning_database.json`（学习数据库）、`lessons_database.json`（经验数据库）
+
+---
+
+## 核心原则
+
+1. **单一职责**：每个模块只做一件事
+2. **明确边界**：模块间通过数据文件交互
+3. **只输出方案**：所有模块只输出建议，不执行
+4. **状态无感知**：Skill 不管理状态，由外部（如 LangGraph）管理
+5. **优先级策略**：Coze 技能优先，ClawHub 作为候补
 
 ---
 
 ## 注意事项
 
-### 1. 模块边界
-- 模块间通过数据文件交互，不直接调用
-- 每个模块只负责一个明确的任务
-- 所有模块只输出方案，不执行操作
-
-### 2. 智能体职责
-- 智能体负责调用模块、传递数据文件
-- 智能体决定是否采纳方案
-- 智能体负责执行编排方案
-- 智能体决定是否回溯
-
-### 3. 动态调整
-- 模块G判断问题类型（简单/复杂/回溯）
-- 模块H生成调整方案或回溯建议
-- 智能体决定是否执行调整或回溯
-
-### 4. 数据格式
-- 所有数据文件使用JSON格式
-- 符合 `references/data_formats.md` 的规范
+- 所有模块独立运行，互不依赖
+- 输出文件使用 JSON 格式
+- 推荐使用模块M（智能补全推荐）替代模块D（补齐决策）
+- LangGraph 集成时，建议使用模块I和J实现实时监控
+- ClawHub 作为候补选项，优先使用 Coze 技能市场
+- 建议定期更新学习数据库和经验数据库
 
 ---
 
 ## 使用示例
 
-### 示例：法律分析任务
-
-```python
-# 1. 环境感知
-result_a = EnvironmentPerceiver().execute({
-    "task_description": "分析2025年AI法律监管政策趋势"
-})
-# 输出: environment_profile
-
-# 2. 能力映射
-result_b = CapabilityMapper().execute({
-    "environment_profile": result_a["environment_profile"],
-    "capability_registry": {...}
-})
-# 输出: match_score=0.70, shortages=[...]
-
-# 3-6. 继续调用其他模块...
-# 最终输出: orchestration_result
-
-# 7. 智能体执行，遇到问题
-
-# 8. 执行监控
-result_g = ExecutionMonitor().execute({
-    "execution_status": {"current_step": 2, "status": "failed", ...},
-    "orchestration_plan": {...}
-})
-# 输出: need_adjustment=true, adjustment_type="simple"
-
-# 9. 动态调整
-result_h = DynamicAdjuster().execute({
-    "execution_status": {...},
-    "adjustment_suggestion": result_g["adjustment_suggestion"],
-    "orchestration_plan": {...}
-})
-# 输出: adjustment_plan 或 revisit_request
-
-# 10. 智能体根据建议继续执行
-```
-
----
-
-## 智能体学习责任
-
-适配器保持无状态，智能体负责：
-- 记录编排方案的执行效果
-- 基于历史优化策略选择
-- 积累领域知识
-
-详见 `references/orchestration_patterns.md` 中的"智能体学习指南"。
+详见各模块的具体使用说明，或参考 `references/overview.md` 获取完整的架构设计和使用场景。

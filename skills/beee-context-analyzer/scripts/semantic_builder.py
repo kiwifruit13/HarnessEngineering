@@ -16,9 +16,9 @@ from typing import Dict, List, Optional, Set, Tuple
 from pathlib import Path
 import hashlib
 
-from vector_store import VectorStore
-from graph_store import GraphStore
-from metadata_store import MetadataStore
+from scripts.vector_store import VectorStore
+from scripts.graph_store import GraphStore
+from scripts.metadata_store import MetadataStore
 
 
 class SemanticBuilder:
@@ -392,7 +392,7 @@ class SemanticBuilder:
         if norm > 0:
             vector = vector / norm
 
-        return vector.tolist()
+        return vector
 
     def _is_config_file(self, file_path: Path) -> bool:
         """判断是否为配置文件"""

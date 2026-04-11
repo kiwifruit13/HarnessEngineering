@@ -146,7 +146,7 @@
 ### 使用映射工具
 
 ```python
-from scripts.types import ExtractionMapping, SemanticBucketType, MemoryCategory
+from scripts.type_defs import ExtractionMapping, SemanticBucketType, MemoryCategory
 
 # 获取目标分类
 category = ExtractionMapping.get_target_category(

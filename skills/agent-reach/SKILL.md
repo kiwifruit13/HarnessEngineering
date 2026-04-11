@@ -20,6 +20,7 @@ description: >
 metadata:
   openclaw:
     homepage: https://github.com/Panniantong/Agent-Reach
+version: 1.1.0
 ---
 
 # Agent Reach — Usage Guide

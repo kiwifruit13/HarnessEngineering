@@ -4,20 +4,332 @@
 
 ## 目录
 
-1. [认知模型枚举](#一认知模型枚举)
-2. [因果链枚举](#二因果链枚举)
-3. [知识缺口枚举](#三知识缺口枚举)
-4. [检索决策枚举](#四检索决策枚举)
-5. [状态一致性枚举](#五状态一致性枚举)
-6. [状态推理枚举](#六状态推理枚举)
-7. [跨会话关联枚举](#七跨会话关联枚举)
-8. [遗忘机制枚举](#八遗忘机制枚举)
-9. [权限控制枚举](#九权限控制枚举)
-10. [可观测性枚举](#十可观测性枚举)
+1. [核心类型枚举（type_defs）](#一核心类型枚举type_defs)
+2. [认知模型枚举](#二认知模型枚举)
+3. [因果链枚举](#三因果链枚举)
+4. [知识缺口枚举](#四知识缺口枚举)
+5. [检索决策枚举](#五检索决策枚举)
+6. [状态一致性枚举](#六状态一致性枚举)
+7. [状态推理枚举](#七状态推理枚举)
+8. [跨会话关联枚举](#八跨会话关联枚举)
+9. [遗忘机制枚举](#九遗忘机制枚举)
+10. [权限控制枚举](#十权限控制枚举)
+11. [可观测性枚举](#十一可观测性枚举)
 
 ---
 
-## 一、认知模型枚举
+## 一、核心类型枚举（type_defs）
+
+> **来源**: `scripts/type_defs.py`
+> **导入**: `from scripts.type_defs import *`
+
+### MemoryType（记忆类型）
+
+```python
+from scripts.type_defs import MemoryType
+```
+
+| 值 | 说明 |
+|------|------|
+| USER_PROFILE | 用户画像 |
+| PROCEDURAL | 程序性记忆 |
+| NARRATIVE | 叙事记忆 |
+| SEMANTIC | 语义记忆 |
+| EMOTIONAL | 情感记忆 |
+
+### MemoryCategory（记忆分类）
+
+```python
+from scripts.type_defs import MemoryCategory
+```
+
+| 值 | 说明 |
+|------|------|
+| CORE_IDENTITY | 核心身份 |
+| CORE_PREFERENCE | 核心偏好 |
+| CORE_SKILL | 核心技能 |
+| EXTENDED_BEHAVIOR | 扩展行为 |
+| EXTENDED_EMOTION | 扩展情感 |
+| EXTENDED_KNOWLEDGE | 扩展知识 |
+| EXTENDED_NARRATIVE | 扩展叙事 |
+| EXTENDED_REFLECTION | 反思记忆 |
+
+### SemanticBucketType（语义分类桶）
+
+```python
+from scripts.type_defs import SemanticBucketType
+```
+
+| 值 | 说明 |
+|------|------|
+| TASK_CONTEXT | 任务上下文桶 |
+| USER_INTENT | 用户意图桶 |
+| KNOWLEDGE_GAP | 知识缺口桶 |
+| EMOTIONAL_TRACE | 情感痕迹桶 |
+| DECISION_CONTEXT | 决策上下文桶 |
+
+### QualityDimension（质量评估维度）
+
+```python
+from scripts.type_defs import QualityDimension
+```
+
+| 值 | 说明 |
+|------|------|
+| RELEVANCE | 相关性 |
+| COMPLETENESS | 完整性 |
+| COHERENCE | 连贯性 |
+| TIMELINESS | 时效性 |
+| DIVERSITY | 多样性 |
+| ACTIONABILITY | 可操作性 |
+
+### ScenarioType（场景类型）
+
+```python
+from scripts.type_defs import ScenarioType
+```
+
+| 值 | 说明 |
+|------|------|
+| CODING | 编码场景 |
+| DEBUGGING | 调试场景 |
+| DESIGN | 设计场景 |
+| ANALYSIS | 分析场景 |
+| LEARNING | 学习场景 |
+| PLANNING | 规划场景 |
+| REVIEW | 审查场景 |
+
+### PhaseType（阶段类型）
+
+```python
+from scripts.type_defs import PhaseType
+```
+
+| 值 | 说明 |
+|------|------|
+| INITIALIZATION | 初始化阶段 |
+| PLANNING | 规划阶段 |
+| EXECUTION | 执行阶段 |
+| REVIEW | 审查阶段 |
+| FINALIZATION | 结束阶段 |
+
+### UserStateType（用户状态类型）
+
+```python
+from scripts.type_defs import UserStateType
+```
+
+| 值 | 说明 |
+|------|------|
+| ACTIVE | 活跃状态 |
+| IDLE | 空闲状态 |
+| BUSY | 忙碌状态 |
+| OFFLINE | 离线状态 |
+
+### HeatLevel（热度等级）
+
+```python
+from scripts.type_defs import HeatLevel
+```
+
+| 值 | 说明 |
+|------|------|
+| HOT | 热门（频繁访问） |
+| WARM | 温热（偶尔访问） |
+| COLD | 冷门（很少访问） |
+
+### ConflictType（冲突类型）
+
+```python
+from scripts.type_defs import ConflictType
+```
+
+| 值 | 说明 |
+|------|------|
+| FACTUAL | 事实冲突 |
+| PREFERENCE | 偏好冲突 |
+| PRIORITY | 优先级冲突 |
+| TEMPORAL | 时间冲突 |
+
+### ResolutionMode（解决模式）
+
+```python
+from scripts.type_defs import ResolutionMode
+```
+
+| 值 | 说明 |
+|------|------|
+| AUTOMATIC | 自动解决 |
+| MANUAL | 手动解决 |
+| HYBRID | 混合解决 |
+
+### TriggerDimension（触发维度）
+
+```python
+from scripts.type_defs import TriggerDimension
+```
+
+| 值 | 说明 |
+|------|------|
+| SEMANTIC | 语义触发 |
+| TEMPORAL | 时间触发 |
+| CONTEXTUAL | 上下文触发 |
+
+### SignalType（信号类型）
+
+```python
+from scripts.type_defs import SignalType
+```
+
+| 值 | 说明 |
+|------|------|
+| ACTIVATION | 激活信号 |
+| DEACTIVATION | 停用信号 |
+| MODIFICATION | 修改信号 |
+
+### InsightType（洞察类型）
+
+```python
+from scripts.type_defs import InsightType
+```
+
+| 值 | 说明 |
+|------|------|
+| BEHAVIOR_PATTERN | 行为模式 |
+| PREFERENCE_CHANGE | 偏好变化 |
+| KNOWLEDGE_GAP | 知识缺口 |
+| PERFORMANCE_METRIC | 性能指标 |
+
+### ReflectionTriggerType（反思触发类型）
+
+```python
+from scripts.type_defs import ReflectionTriggerType
+```
+
+| 值 | 说明 |
+|------|------|
+| SELF_DETECTED | 模型自检测触发 |
+| EXTERNAL_TRIGGER | 外部触发（用户反馈等） |
+| SCHEDULED | 定期检查触发 |
+| CONTEXT_CHANGE | 上下文变化触发 |
+
+### ReflectionOutcome（反思结果）
+
+```python
+from scripts.type_defs import ReflectionOutcome
+```
+
+| 值 | 说明 |
+|------|------|
+| CONFIRMED | 确认正确，无需修改 |
+| CORRECTED | 发现问题并已修正 |
+| ABORTED | 中止反思 |
+| FALSE_POSITIVE | 误报，无需反思 |
+
+### LearningValue（学习价值）
+
+```python
+from scripts.type_defs import LearningValue
+```
+
+| 值 | 说明 |
+|------|------|
+| HIGH | 高价值（如修正成功） |
+| MEDIUM | 中等价值（如确认正确） |
+| LOW | 低价值（如误报） |
+
+### ReflectionSeverity（反思严重程度）
+
+```python
+from scripts.type_defs import ReflectionSeverity
+```
+
+| 值 | 说明 |
+|------|------|
+| CRITICAL | 严重 |
+| HIGH | 高 |
+| MEDIUM | 中 |
+| LOW | 低 |
+
+### InsightPriority（洞察优先级）
+
+```python
+from scripts.type_defs import InsightPriority
+```
+
+| 值 | 说明 |
+|------|------|
+| CRITICAL | 关键 |
+| HIGH | 高 |
+| MEDIUM | 中 |
+| LOW | 低 |
+
+### SignalStrength（信号强度）
+
+```python
+from scripts.type_defs import SignalStrength
+```
+
+| 值 | 说明 |
+|------|------|
+| STRONG | 强 |
+| MODERATE | 中等 |
+| WEAK | 弱 |
+
+### DecisionType（决策类型）
+
+```python
+from scripts.type_defs import DecisionType
+```
+
+| 值 | 说明 |
+|------|------|
+| SINGLE_CHOICE | 单选 |
+| MULTI_CHOICE | 多选 |
+| YES_NO | 是非 |
+
+### TaskType（任务类型）
+
+```python
+from scripts.type_defs import TaskType
+```
+
+| 值 | 说明 |
+|------|------|
+| SIMPLE | 简单任务 |
+| COMPLEX | 复杂任务 |
+| MULTI_STEP | 多步骤任务 |
+
+### StateEventType（状态事件类型）
+
+```python
+from scripts.type_defs import StateEventType
+```
+
+| 值 | 说明 |
+|------|------|
+| PHASE_CHANGE | 阶段变化 |
+| TASK_SWITCH | 任务切换 |
+| ERROR_OCCURRED | 错误发生 |
+| USER_STATE_CHANGE | 用户状态变化 |
+| MEMORY_UPDATE | 记忆更新 |
+
+### ConflictSeverity（冲突严重程度）
+
+```python
+from scripts.type_defs import ConflictSeverity
+```
+
+| 值 | 说明 |
+|------|------|
+| CRITICAL | 严重：需要立即解决 |
+| HIGH | 高：需要尽快解决 |
+| MEDIUM | 中：建议解决 |
+| LOW | 低：可忽略 |
+
+---
+
+## 二、认知模型枚举
 
 ### StepResult（步骤结果）
 
@@ -89,7 +401,7 @@ from scripts.cognitive_model_builder import DecisionStatus
 
 ---
 
-## 二、因果链枚举
+## 三、因果链枚举
 
 ### CausalRelationType（因果关系类型）
 
@@ -135,7 +447,7 @@ from scripts.causal_chain_extractor import SolutionStatus
 
 ---
 
-## 三、知识缺口枚举
+## 四、知识缺口枚举
 
 ### KnowledgeType（知识类型）
 
@@ -197,7 +509,7 @@ from scripts.knowledge_gap_identifier import BlockingLevel
 
 ---
 
-## 四、检索决策枚举
+## 五、检索决策枚举
 
 ### RetrievalNeed（检索需求级别）
 
@@ -255,7 +567,7 @@ from scripts.retrieval_decision_engine import CacheDecision
 
 ---
 
-## 五、检索质量枚举
+## 六、检索质量枚举
 
 ### QualityDimension（质量维度）
 
@@ -301,7 +613,7 @@ from scripts.retrieval_quality_evaluator import ReretrievalNeed
 
 ---
 
-## 六、状态一致性枚举
+## 七、状态一致性枚举
 
 ### ConsistencyLevel（一致性级别）
 
@@ -320,7 +632,7 @@ from scripts.state_consistency_validator import ConsistencyLevel
 ### ConflictSeverity（冲突严重程度）
 
 ```python
-from scripts.types import ConflictSeverity
+from scripts.type_defs import ConflictSeverity
 ```
 
 | 值 | 说明 |
@@ -360,7 +672,7 @@ from scripts.state_consistency_validator import StateModule
 
 ---
 
-## 七、状态推理枚举
+## 八、状态推理枚举
 
 ### InferenceType（推理类型）
 
@@ -405,7 +717,7 @@ from scripts.state_inference_engine import InferenceSource
 
 ---
 
-## 八、跨会话关联枚举
+## 九、跨会话关联枚举
 
 ### LinkStrength（关联强度）
 
@@ -450,7 +762,7 @@ from scripts.cross_session_memory_linker import SessionStatus
 
 ---
 
-## 九、遗忘机制枚举
+## 十、遗忘机制枚举
 
 ### MemoryImportance（记忆重要性）
 
@@ -510,7 +822,7 @@ from scripts.memory_forgetting_mechanism import MemoryState
 
 ---
 
-## 十、权限控制枚举
+## 十一、权限控制枚举
 
 ### AccessAction（访问动作）
 
@@ -555,7 +867,7 @@ from scripts.permission_boundary_controller import PermissionLevel
 
 ---
 
-## 十一、可观测性枚举
+## 十二、可观测性枚举
 
 ### AlertLevel（告警级别）
 

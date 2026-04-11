@@ -50,6 +50,33 @@ class FactorC(ctypes.Structure):
     ]
 
 
+class WeightResult:
+    """权重计算结果"""
+
+    def __init__(self, weights: Dict[str, float], calculator: 'WeightCalculator'):
+        """
+        初始化权重结果
+
+        Args:
+            weights: 权重字典
+            calculator: 权重计算器引用（用于调用 top_k）
+        """
+        self.weights = weights
+        self.calculator = calculator
+
+    def top_k(self, k: int = 10) -> List[Tuple[str, float]]:
+        """
+        获取权重最高的 K 个节点
+
+        Args:
+            k: 返回前K个
+
+        Returns:
+            [(node_id, weight), ...] 按权重降序排列
+        """
+        return self.calculator.top_k(self.weights, k)
+
+
 class WeightCalculator:
     """权重计算器（支持 Rust 加速）"""
 
@@ -264,6 +291,55 @@ class WeightCalculator:
                 hash_func.update(chunk)
 
         return hash_func.hexdigest()
+
+    def compute_weights(self, query: str, nodes: List) -> WeightResult:
+        """
+        根据查询计算节点权重
+
+        Args:
+            query: 查询字符串
+            nodes: 节点列表（可以是节点对象或节点ID列表）
+
+        Returns:
+            WeightResult 对象
+        """
+        # 生成查询向量
+        import hashlib
+        query_vector = []
+        seed = hash(query)
+
+        for i in range(768):
+            seed = (seed * 1103515245 + 12345) & 0x7fffffff
+            value = (seed % 10000) / 10000.0
+            query_vector.append(value - 0.5)
+
+        # 归一化
+        import numpy as np
+        query_vector = np.array(query_vector, dtype=np.float32)
+        norm = np.linalg.norm(query_vector)
+        if norm > 0:
+            query_vector = query_vector / norm
+
+        # 如果没有节点，返回空结果
+        if not nodes:
+            return WeightResult({}, self)
+
+        # 计算权重（这里使用简化的方法，实际应该查询向量存储）
+        weights = {}
+
+        # 假设 nodes 是节点对象列表
+        for i, node in enumerate(nodes):
+            if isinstance(node, dict):
+                node_id = node.get('node_id') or node.get('id', str(i))
+            else:
+                node_id = str(node)
+
+            # 简化的权重计算（基于节点ID的哈希）
+            seed = hash(f"{query}:{node_id}")
+            weight = (seed % 10000) / 10000.0
+            weights[node_id] = weight
+
+        return WeightResult(weights, self)
 
     # ============================================================================
     # 相似度计算

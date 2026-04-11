@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 冷热度管理器
 
@@ -20,7 +39,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from .types import HeatLevel
+from .type_defs import HeatLevel
 
 
 class HeatManager:
@@ -183,6 +202,56 @@ class HeatManager:
             "emotional": 0.98,  # 情感记忆衰减快（时间衰减）
         }
         return decay_factors.get(memory_type, self._decay_factor)
+
+    # ========================================================================
+    # 【新增】测试支持方法
+    # ========================================================================
+
+    def is_hot(
+        self,
+        memory_type: str,
+        access_count: int,
+        last_accessed_days: int,
+    ) -> bool:
+        """
+        判断记忆是否为热数据
+
+        Args:
+            memory_type: 记忆类型
+            access_count: 访问次数
+            last_accessed_days: 距离上次访问的天数
+
+        Returns:
+            是否为热数据
+        """
+        # 访问次数超过阈值且最近访问过
+        access_threshold = 5
+        days_threshold = 7
+
+        return access_count >= access_threshold and last_accessed_days <= days_threshold
+
+    def is_cold(
+        self,
+        memory_type: str,
+        access_count: int,
+        last_accessed_days: int,
+    ) -> bool:
+        """
+        判断记忆是否为冷数据
+
+        Args:
+            memory_type: 记忆类型
+            access_count: 访问次数
+            last_accessed_days: 距离上次访问的天数
+
+        Returns:
+            是否为冷数据
+        """
+        # 访问次数少且很久没有访问
+        access_threshold = 2
+        days_threshold = 30
+
+        return access_count <= access_threshold and last_accessed_days >= days_threshold
 
 
 # ============================================================================

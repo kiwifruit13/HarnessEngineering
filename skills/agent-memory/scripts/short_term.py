@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 短期记忆模块
 
@@ -25,7 +44,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any, TYPE_CHECKING
 
-from .types import (
+from .type_defs import (
     ShortTermMemoryItem,
     ShortTermMemoryBucket,
     SemanticBucketType,
@@ -1006,6 +1025,45 @@ class ShortTermMemoryManager:
         for bucket_type, bucket in self._buckets.items():
             counts[bucket_type.value] = bucket.clear()
         return counts
+
+    # ========================================================================
+    # 【新增】测试支持方法
+    # ========================================================================
+
+    def prune_low_relevance(self, threshold: float = 0.5) -> int:
+        """
+        清理低相关性记忆
+
+        Args:
+            threshold: 相关性阈值，低于此值的记忆将被删除
+
+        Returns:
+            清理的记忆数量
+        """
+        removed_count = 0
+        for bucket in self._buckets.values():
+            original_count = len(bucket._bucket.items)
+            # 保留相关性分数高于阈值的项
+            bucket._bucket.items = [
+                item for item in bucket._bucket.items
+                if item.relevance_score >= threshold
+            ]
+            removed_count += original_count - len(bucket._bucket.items)
+        return removed_count
+
+    def apply_time_decay(self) -> None:
+        """
+        应用时间衰减，根据记忆的创建时间降低相关性分数
+        """
+        now = datetime.now()
+        decay_factor = 0.95  # 每小时衰减5%
+
+        for bucket in self._buckets.values():
+            for item in bucket._bucket.items:
+                if item.created_at:
+                    hours_old = (now - item.created_at).total_seconds() / 3600
+                    decay = decay_factor ** hours_old
+                    item.relevance_score *= decay
 
     # ========================================================================
     # 【新增】跨层关联索引方法

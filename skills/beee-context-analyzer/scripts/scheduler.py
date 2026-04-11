@@ -13,8 +13,8 @@ from enum import Enum
 import re
 from datetime import datetime
 
-from semantic_builder import SemanticBuilder
-from weight_calculator import WeightCalculator
+from scripts.semantic_builder import SemanticBuilder
+from scripts.weight_calculator import WeightCalculator
 
 
 class TaskType(Enum):
@@ -249,21 +249,29 @@ class ResourceAllocator:
 class Scheduler:
     """预测调度器"""
 
-    def __init__(self, semantic_builder: SemanticBuilder):
+    def __init__(self, semantic_builder: Optional[SemanticBuilder] = None):
         """
         初始化调度器
 
         Args:
-            semantic_builder: 语义网构建器
+            semantic_builder: 语义网构建器（可选，如果未提供则创建一个）
         """
-        self.builder = semantic_builder
+        if semantic_builder is None:
+            self.builder = SemanticBuilder()
+            self.builder.analyze_project()
+            self.builder.build_semantic_web()
+        else:
+            self.builder = semantic_builder
+
         self.intent_recognizer = IntentRecognizer()
-        self.dependency_expander = DependencyExpander(semantic_builder)
-        self.resource_allocator = ResourceAllocator(semantic_builder)
+        self.dependency_expander = DependencyExpander(self.builder)
+        self.resource_allocator = ResourceAllocator(self.builder)
 
     def schedule(
         self,
-        task_description: str,
+        task_description: Optional[str] = None,
+        task_type: Optional[str] = None,
+        context: Optional[str] = None,
         context_nodes: Optional[List[str]] = None,
         max_resources: int = 20
     ) -> Dict:
@@ -271,7 +279,9 @@ class Scheduler:
         智能调度资源
 
         Args:
-            task_description: 任务描述
+            task_description: 任务描述（兼容旧版本）
+            task_type: 任务类型（"bug_fix", "new_feature", "refactoring" 等）
+            context: 上下文描述
             context_nodes: 上下文节点列表（可选）
             max_resources: 最大资源数量
 
@@ -283,10 +293,29 @@ class Scheduler:
                 "summary": str
             }
         """
-        # 1. 识别意图
-        task_type, confidence = self.intent_recognizer.recognize(task_description)
+        # 兼容 SKILL.md 中的调用方式
+        if task_type and context:
+            # 新的调用方式：scheduler.schedule(task_type="bug_fix", context="...")
+            task_description = f"{task_type}: {context}"
+        elif not task_description:
+            task_description = "default task"
 
-        print(f"识别到任务类型: {task_type.value} (置信度: {confidence:.2f})")
+        # 1. 识别意图
+        recognized_type, confidence = self.intent_recognizer.recognize(task_description)
+
+        # 如果明确指定了 task_type，使用指定的类型
+        if task_type:
+            try:
+                # 尝试匹配 TaskType 枚举
+                from scripts.scheduler import TaskType
+                for t in TaskType:
+                    if t.value == task_type or t.name == task_type.upper():
+                        recognized_type = t
+                        break
+            except:
+                pass
+
+        print(f"识别到任务类型: {recognized_type.value} (置信度: {confidence:.2f})")
 
         # 2. 确定起始节点
         start_nodes = []
@@ -309,7 +338,7 @@ class Scheduler:
         # 4. 分配资源（计算权重）
         allocated = self.resource_allocator.allocate(
             related_nodes,
-            task_type,
+            recognized_type,
             max_resources
         )
 
@@ -331,10 +360,10 @@ class Scheduler:
         files.sort(key=lambda x: x["weight"], reverse=True)
 
         # 6. 生成摘要
-        summary = self._generate_summary(task_type, files, task_description)
+        summary = self._generate_summary(recognized_type, files, task_description)
 
         return {
-            "task_type": task_type,
+            "task_type": recognized_type,
             "confidence": confidence,
             "files": files,
             "summary": summary
@@ -356,7 +385,7 @@ class Scheduler:
         total_classes = len([f for f in files if f["type"] == "class"])
 
         languages = set(f["language"] for f in files if f.get("language"))
-        total_lines = sum(f.get("line_count", 0) for f in files)
+        total_lines = sum(f.get("line_count") or 0 for f in files)
 
         # 生成摘要
         summary = f"## 任务上下文摘要\n\n"

@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - Token 预算管理器
 
@@ -574,6 +593,28 @@ class TokenBudgetManager:
             "compression_ratio": round(compression_ratio, 2),
             "suggestion": suggestions.get(token_type, "建议减少内容量"),
         }
+
+    # ========================================================================
+    # 【新增】测试支持方法（别名）
+    # ========================================================================
+
+    def get_used_tokens(self) -> int:
+        """
+        获取已使用的 Token 数（别名方法）
+
+        Returns:
+            已使用 Token 数
+        """
+        return self.get_used()
+
+    def get_remaining_tokens(self) -> int:
+        """
+        获取剩余 Token 数（别名方法）
+
+        Returns:
+            剩余 Token 数
+        """
+        return self.get_remaining()
 
 
 # ============================================================================

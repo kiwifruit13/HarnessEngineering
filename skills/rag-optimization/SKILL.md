@@ -1,13 +1,20 @@
 ---
 name: rag-optimization
-description: 当需要RAG检索内容时触发；完整的RAG系统优化方案，涵盖21+种策略（含Self-RAG、命题分块、片段提取、上下文压缩、引用溯源、查询意图、多跳检索、文档预处理）；提供诊断工具、实现代码、配置模板与评估框架；帮助构建高准确率生产级RAG应用；当用户需要优化知识库问答、提升检索准确率、评估RAG系统效果、解决检索噪音或降低幻觉问题时使用
-author: kiwifruit
+description: 完整的RAG系统优化方案，涵盖21+种策略（Self-RAG、命题分块、上下文压缩、引用溯源、查询意图等）；提供诊断工具、实现代码与评估框架；当用户需要优化知识库问答、提升检索准确率、降低幻觉或评估RAG效果时使用
 dependency:
   python:
-    - anthropic>=0.18.0
     - sentence-transformers>=2.2.0
     - rank-bm25>=0.2.2
     - networkx>=3.0
+    - numpy>=1.21.0
+    - pdfplumber>=0.7.0
+    - pypdf>=3.0.0
+    - python-docx>=0.8.11
+    - beautifulsoup4>=4.9.0
+    - lxml>=4.6.0
+    - pytesseract>=0.3.8
+    - Pillow>=8.0.0
+    - openpyxl>=3.0.0
 ---
 
 # RAG检索优化技能
@@ -414,14 +421,6 @@ RAG优化策略
 ## 注意事项
 
 - **环境准备**：参考 [全局操作说明](references/global-operations.md) 完成依赖安装和配置
-- **参数调优**：根据文档类型和查询特征调整参数，详见 [参数调优指南](references/global-operations.md#五参数调优指南)
+- **参数调优**：根据文档类型和查询特征调整参数，详见 [参数调优指南](references/global-operations.md)
 - **策略组合**：避免过度优化，根据问题诊断选择必要策略
 - **评估迭代**：优化前建立基准指标，定期评估效果
-
----
-
-## 版本信息
-
-- **版本**: 2.0.0
-- **更新日期**: 2024-12
-- **本次更新**: 新增5项核心技术，策略总数21+，覆盖率80%+

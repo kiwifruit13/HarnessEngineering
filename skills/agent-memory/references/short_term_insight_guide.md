@@ -68,12 +68,12 @@ class TopicCluster(BaseModel):
     cluster_id: str              # 唯一标识
     topic_label: str             # 话题标签（自动生成）
     items: list[ShortTermMemoryItem]  # 属于该话题的记忆项
-    
+
     # 洞察分析结果
     keywords: list[str]          # 核心关键词
     priority: float              # 提炼优先级 (0-1)
     coherence: float             # 簇内聚性 (0-1)
-    
+
     # 提炼决策
     should_extract: bool         # 是否应该提炼
     skip_reason: str             # 跳过原因
@@ -106,7 +106,7 @@ class ExtractionDecision(BaseModel):
     clusters: list[TopicCluster]     # 话题簇列表
     relations: list[TopicRelation]   # 话题关联列表
     extraction_order: list[str]      # 提炼顺序
-    
+
     # 统计
     total_items: int                 # 总项数
     items_to_extract: int            # 待提炼项数
@@ -164,41 +164,41 @@ def _cluster_by_topic(self, items, item_keywords):
     3. 基于关键词重叠判断相似性
     """
     clusters = []
-    
+
     # 按桶类型分组
     items_by_bucket = group_by_bucket(items)
-    
+
     for bucket_type, bucket_items in items_by_bucket.items():
         used = set()
-        
+
         for item in bucket_items:
             if item in used:
                 continue
-            
+
             # 找相似项形成簇
             cluster_items = [item]
             cluster_keywords = item_keywords[item]
-            
+
             for other in bucket_items:
                 if other in used:
                     continue
-                
+
                 # 计算相似度（Jaccard系数）
                 similarity = jaccard(cluster_keywords, item_keywords[other])
-                
+
                 if similarity >= threshold:
                     cluster_items.append(other)
                     cluster_keywords.update(item_keywords[other])
-            
+
             # 生成话题标签
             topic_label = generate_label(cluster_keywords)
-            
+
             clusters.append(TopicCluster(
                 topic_label=topic_label,
                 items=cluster_items,
                 keywords=list(cluster_keywords),
             ))
-    
+
     return clusters
 ```
 
@@ -349,3 +349,9 @@ for cluster in insight.decision.clusters:
 ```
 短期洞察 → 精准提炼 → 高质量长期记忆 → 高质量长期洞察
 ```
+
+## 参考文档
+
+- [架构总览](architecture_overview.md)
+- [短期记忆到长期记忆映射](memory_types.md#短期记忆到长期记忆映射)
+- [洞察设计](insight_design.md)

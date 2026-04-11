@@ -20,58 +20,58 @@
 
 ### 🔍 **网络搜索与内容获取**
 
-| 技能 | 描述 |
-|------|------|
+| 技能                | 描述                                         |
+| ------------------- | -------------------------------------------- |
 | **web-search-free** | 免费网络搜索 - 无需 API Key 的多引擎网络搜索 |
 
 ### 🛠️ **代码工程与规划**
 
-| 技能 | 描述 |
-|------|------|
-| **brain-framework** | 代码库改造框架 - 基于 Boris Tane 方法论的系统化改造方案 |
-| **planning-with-files** | 文件规划系统 - 基于文件的项目规划工具 |
+| 技能                    | 描述                                                    |
+| ----------------------- | ------------------------------------------------------- |
+| **brain-framework**     | 代码库改造框架 - 基于 Boris Tane 方法论的系统化改造方案 |
+| **planning-with-files** | 文件规划系统 - 基于文件的项目规划工具                   |
 
 ### 🧠 **RAG 优化与检索**
 
-| 技能 | 描述 |
-|------|------|
+| 技能                 | 描述                                          |
+| -------------------- | --------------------------------------------- |
 | **rag-optimization** | RAG 系统优化方案 - 17+ 种检索增强生成优化策略 |
 
 ### 🎯 **AI 行为与执行规范**
 
-| 技能 | 描述 |
-|------|------|
+| 技能                     | 描述                                             |
+| ------------------------ | ------------------------------------------------ |
 | **skill-behavior-guide** | Skill 执行行为指导 - AI 智能体执行规范和质量保证 |
-| **using-superpowers** | 超能力使用指南 - Skill 使用规范和最佳实践 |
+| **using-superpowers**    | 超能力使用指南 - Skill 使用规范和最佳实践        |
 
 ### 💡 **认知发展与学习**
 
-| 技能 | 描述 |
-|------|------|
-| **meta-wisdom-transfer** | 元感悟传递引擎 - 传递完整的认知跃迁过程 |
-| **talent-cognition** | 天赋认知框架 - 系统化的天赋识别和发展指导 |
-| **deep-reading** | 深度阅读技能 - 文档和论文的深度理解工具 |
+| 技能                     | 描述                                      |
+| ------------------------ | ----------------------------------------- |
+| **meta-wisdom-transfer** | 元感悟传递引擎 - 传递完整的认知跃迁过程   |
+| **talent-cognition**     | 天赋认知框架 - 系统化的天赋识别和发展指导 |
+| **deep-reading**         | 深度阅读技能 - 文档和论文的深度理解工具   |
 
 ### 🤖 **智能体系统**
 
-| 技能 | 描述 |
-|------|------|
-| **agent-memory** | AI 智能体记忆管理系统 |
-| **agent-reach** | AI 智能体能力扩展框架 |
+| 技能                                | 描述                                |
+| ----------------------------------- | ----------------------------------- |
+| **agent-memory**                    | AI 智能体记忆管理系统               |
+| **agent-reach**                     | AI 智能体能力扩展框架               |
 | **intelligent-environment-adapter** | 智能环境适配器 - 自适应环境配置系统 |
-| **beee-context-analyzer** | BEEE 上下文分析器 |
+| **beee-context-analyzer**           | BEEE 上下文分析器                   |
 
 ### 🚀 **高级模型与教程**
 
-| 技能 | 描述 |
-|------|------|
-| **agi-evolution-model-linux** | AGI 进化模型（Linux 版本） |
+| 技能                          | 描述                                    |
+| ----------------------------- | --------------------------------------- |
+| **agi-evolution-model-linux** | AGI 进化模型（Linux 版本）              |
 | **function-calling-tutorial** | 函数调用教程 - 学习如何有效使用函数调用 |
 
 ### 📝 **内容处理**
 
-| 技能 | 描述 |
-|------|------|
+| 技能          | 描述                                    |
+| ------------- | --------------------------------------- |
 | **summarize** | 文本摘要技能 - 高效的内容摘要和总结工具 |
 
 ---
@@ -325,17 +325,17 @@ cat rag-optimization/assets/config-template.json
 
 ## 📊 技能统计
 
-| 类别 | 数量 | 技能 |
-|------|------|------|
-| 网络搜索 | 1 | web-search-free |
-| 代码工程 | 2 | brain-framework, planning-with-files |
-| RAG 优化 | 1 | rag-optimization |
-| AI 行为 | 2 | skill-behavior-guide, using-superpowers |
-| 认知发展 | 3 | meta-wisdom-transfer, talent-cognition, deep-reading |
-| 智能体系统 | 4 | agent-memory, agent-reach, intelligent-environment-adapter, beee-context-analyzer |
-| 高级模型 | 2 | agi-evolution-model-linux, function-calling-tutorial |
-| 内容处理 | 1 | summarize |
-| **总计** | **16** | - |
+| 类别       | 数量   | 技能                                                                              |
+| ---------- | ------ | --------------------------------------------------------------------------------- |
+| 网络搜索   | 1      | web-search-free                                                                   |
+| 代码工程   | 2      | brain-framework, planning-with-files                                              |
+| RAG 优化   | 1      | rag-optimization                                                                  |
+| AI 行为    | 2      | skill-behavior-guide, using-superpowers                                           |
+| 认知发展   | 3      | meta-wisdom-transfer, talent-cognition, deep-reading                              |
+| 智能体系统 | 4      | agent-memory, agent-reach, intelligent-environment-adapter, beee-context-analyzer |
+| 高级模型   | 2      | agi-evolution-model-linux, function-calling-tutorial                              |
+| 内容处理   | 1      | summarize                                                                         |
+| **总计**   | **16** | -                                                                                 |
 
 ---
 
@@ -375,6 +375,13 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ## 📈 更新日志
 
+### v1.1.0 (2026-04-11)
+
+- ✨ 技能版本更新
+- 🔄 所有技能添加版本号管理
+- 📝 完善技能元数据
+- 🔧 优化技能实现
+
 ### v1.0.0 (2026-03-29)
 
 - ✨ 初始版本发布
@@ -386,4 +393,4 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 **Made with ❤️ by kiwifruit**
 
-*最后更新: 2026-03-29*
+_最后更新: 2026-04-11_

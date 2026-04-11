@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - 增量同步模块
 
@@ -84,6 +103,12 @@ class SyncStats(BaseModel):
     skipped_count: int = 0
     failed_count: int = 0
     last_sync: datetime = Field(default_factory=datetime.now)
+
+    # 【新增】用于测试的别名属性
+    @property
+    def total_count(self) -> int:
+        """总记忆数（别名）"""
+        return self.total_memories
 
 
 # ============================================================================

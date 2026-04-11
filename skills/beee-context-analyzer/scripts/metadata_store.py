@@ -17,13 +17,18 @@ from contextlib import contextmanager
 class MetadataStore:
     """元数据存储（SQLite）"""
 
-    def __init__(self, db_path: str = ":memory:"):
+    def __init__(self, db_path: Optional[str] = None):
         """
         初始化元数据存储
 
         Args:
-            db_path: 数据库路径，默认为内存数据库
+            db_path: 数据库路径，默认为临时文件（如果未指定则创建临时文件）
         """
+        if db_path is None:
+            import tempfile
+            import os
+            fd, db_path = tempfile.mkstemp(suffix='.db', prefix='beee_metadata_')
+            os.close(fd)
         self.db_path = db_path
         self._init_db()
 

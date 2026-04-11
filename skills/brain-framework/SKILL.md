@@ -5,7 +5,6 @@ dependency:
   python:
     - pydantic>=2.0.0
     - pyyaml>=6.0
-    - langchain-openai>=1.0.0
   system: []
 ---
 
@@ -17,11 +16,6 @@ dependency:
 - 触发条件：需要对代码库进行系统性改造、重构或功能扩展时
 
 ## 前置准备
-### 依赖安装
-```bash
-pip install pydantic>=2.0.0 pyyaml>=6.0 langchain-openai>=1.0.0
-```
-
 ### 配置文件
 创建 `brain-config.yaml` 配置文件（格式见 [references/config.md](references/config.md)）
 
@@ -137,12 +131,21 @@ python scripts/modification_check.py \
 - 领域参考：
   - [references/config.md](references/config.md) - 配置文件格式（执行前）
   - [references/workflow.md](references/workflow.md) - 完整工作流说明（遇到问题时）
+  - [references/type-safety.md](references/type-safety.md) - 类型安全指南（处理弱类型问题时）
 - 输出资产：
   - [assets/prompts/research.md](assets/prompts/research.md) - Research prompt模板
   - [assets/prompts/plan.md](assets/prompts/plan.md) - Plan prompt模板
   - [assets/prompts/implement.md](assets/prompts/implement.md) - Implement prompt模板
 
 ## 注意事项
+
+### 核心约束规则
+- **规划触发条件**：涉及 3 步以上或包含设计决策的任务，必须进入 Plan 阶段生成详细计划
+- **问题处理原则**：遇到问题不要强行推进，立即停止并重新规划（回退到 Plan 阶段）
+- **验证规划要求**：验证阶段也要使用规划模式，在 `plan.md` 中包含验证策略章节
+- **规范先行原则**：开始前先写详细规范，减少歧义（Research 阶段输出需求澄清和边界定义）
+
+### 执行原则
 - **人决策，AI 执行**：Plan 阶段必须输出可执行计划，避免 AI 幻觉污染代码
 - **文档即共享状态**：所有中间结果（research.md、plan.md）应持久化存储
 - **修改权衡守卫**：Implement 阶段的任何架构级修改必须经过 ModificationCheck

@@ -1,0 +1,145 @@
+{
+  "version": "1.0",
+  "talents": [
+    {
+      "id": "agile_development",
+      "name": "敏捷开发",
+      "description": "具备敏捷开发思维和实践能力，能够快速迭代、持续改进，灵活应对变化",
+      "constraints": [
+        "保持快速迭代节奏",
+        "能够根据反馈及时调整",
+        "注重交付价值而非完美",
+        "能处理不确定性"
+      ],
+      "features": {
+        "task_types": [
+          "planning",
+          "execution",
+          "decision"
+        ],
+        "complexity": [
+          "medium",
+          "complex"
+        ],
+        "output_formats": [
+          "text",
+          "structured"
+        ],
+        "time_pressure": [
+          "normal",
+          "urgent"
+        ],
+        "precision": [
+          "normal"
+        ],
+        "interactivity": [
+          "interactive"
+        ],
+        "domains": [
+          "technical",
+          "business"
+        ]
+      },
+      "weights": {
+        "task_type": 0.4,
+        "complexity": 0.2,
+        "time_pressure": 0.2,
+        "domain": 0.2
+      }
+    },
+    {
+      "id": "strategy_decisions",
+      "name": "战略决策（增强版）",
+      "description": "具备卓越的战略决策能力，能够进行长远规划，考虑多维度因素，做出最优决策",
+      "constraints": [
+        "保持简洁高效，避免过度分析",
+        "能考虑决策的长期影响（10年以上）",
+        "能够平衡短期收益和长期价值",
+        "能识别关键成功因素"
+      ],
+      "features": {
+        "task_types": [
+          "planning",
+          "decision"
+        ],
+        "complexity": [
+          "medium",
+          "complex"
+        ],
+        "output_formats": [
+          "structured",
+          "text"
+        ],
+        "time_pressure": [
+          "normal",
+          "relaxed"
+        ],
+        "precision": [
+          "normal",
+          "precise"
+        ],
+        "interactivity": [
+          "one_way",
+          "interactive"
+        ],
+        "domains": [
+          "business",
+          "career",
+          "academic"
+        ]
+      },
+      "weights": {
+        "task_type": 0.5,
+        "complexity": 0.2,
+        "precision": 0.2,
+        "domain": 0.1
+      }
+    },
+    {
+      "id": "data_analysis",
+      "name": "数据分析",
+      "description": "擅长从数据中提取洞察，发现模式和趋势，支持数据驱动的决策",
+      "constraints": [
+        "保持客观严谨的数据态度",
+        "能够处理大量数据",
+        "能识别数据中的模式和异常",
+        "能将数据转化为可执行的建议"
+      ],
+      "features": {
+        "task_types": [
+          "analysis",
+          "research",
+          "decision"
+        ],
+        "complexity": [
+          "simple",
+          "medium"
+        ],
+        "output_formats": [
+          "data",
+          "structured"
+        ],
+        "time_pressure": [
+          "normal"
+        ],
+        "precision": [
+          "precise"
+        ],
+        "interactivity": [
+          "one_way"
+        ],
+        "domains": [
+          "technical",
+          "business",
+          "academic"
+        ]
+      },
+      "weights": {
+        "task_type": 0.3,
+        "complexity": 0.2,
+        "output_format": 0.3,
+        "precision": 0.2
+      }
+    }
+  ]
+}

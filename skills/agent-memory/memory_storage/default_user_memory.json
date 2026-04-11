@@ -1,0 +1,43 @@
+{
+  "user_id": "default_user",
+  "user_profile": {
+    "memory_id": "profile_d6146e69f57a",
+    "memory_type": "user_profile",
+    "user_id": "default_user",
+    "data": {
+      "identity": [],
+      "technical_background": {
+        "domains": [],
+        "expertise_level": "intermediate"
+      },
+      "communication_style": {
+        "style": "balanced",
+        "preference": "detailed",
+        "dislike": []
+      },
+      "decision_pattern": {
+        "type": "balanced",
+        "requires": "sufficient_evidence",
+        "focus": "balanced"
+      },
+      "knowledge_blindspots": [],
+      "version": 4
+    },
+    "heat": {
+      "heat_score": 50.0,
+      "heat_level": "warm",
+      "last_accessed_at": "2026-04-04T15:03:16.688452",
+      "access_count": 0
+    },
+    "timestamp": {
+      "created_at": "2026-04-04T15:03:16.688462",
+      "updated_at": "2026-04-04T15:03:16.688463"
+    }
+  },
+  "procedural": null,
+  "narrative": null,
+  "semantic": null,
+  "emotional": null,
+  "reflection_index": [],
+  "last_updated": "2026-04-04T15:06:02.283649"
+}

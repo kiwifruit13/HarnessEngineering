@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - Scripts Package
 
@@ -7,7 +26,7 @@ Agent Memory System - Scripts Package
 __version__ = "3.0.0"
 
 # 核心模块
-from .types import *
+from .type_defs import *
 from .perception import PerceptionMemoryStore
 from .short_term import SemanticBucket, ShortTermMemoryManager, AsynchronousExtractor
 from .short_term_insight import (
@@ -25,6 +44,7 @@ from .context_reconstructor import (
 )
 from .insight_module import InsightPool, DetachedObserver, InsightModule
 from .state_capture import GlobalStateCapture
+from .type_defs import GlobalState, GlobalStateSnapshot
 from .heat_manager import HeatManager
 from .conflict_resolver import ConflictResolver
 from .privacy import (
@@ -76,6 +96,25 @@ from .chain_reasoning import (
     ChainReasoningEnhancer,
     create_chain_reasoning_enhancer,
 )
+from .knowledge_gap_identifier import (
+    KnowledgeGapIdentifier,
+    KnowledgeType,
+    GapAnalysisResult,
+    IdentifiedGap,
+)
+from .retrieval_decision_engine import (
+    RetrievalDecisionEngine,
+    RetrievalNeed,
+    RetrievalDecision,
+)
+from .causal_chain_extractor import (
+    CausalChainExtractor,
+    ExtractedCausalChain,
+)
+from .context_orchestrator import (
+    ContextOrchestrator,
+    create_context_orchestrator,
+)
 # Redis 基础设施层
 from .redis_adapter import (
     REDIS_AVAILABLE,
@@ -108,6 +147,7 @@ from .context_orchestrator import (
     ContextOrchestrator,
     create_context_orchestrator,
 )
+from .type_defs import ContextPackage
 # 异步写入（性能优化）
 from .async_writer import (
     AsyncWriter,
@@ -153,6 +193,8 @@ __all__ = [
     "InsightModule",
     # 状态捕捉
     "GlobalStateCapture",
+    "GlobalState",
+    "GlobalStateSnapshot",
     # 冷热度管理
     "HeatManager",
     # 冲突解决
@@ -224,6 +266,7 @@ __all__ = [
     "PreparedContext",
     "ContextOrchestrator",
     "create_context_orchestrator",
+    "ContextPackage",
     # 异步写入（性能优化）
     "AsyncWriter",
     "WriterConfig",

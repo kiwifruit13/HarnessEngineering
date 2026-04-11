@@ -1,3 +1,22 @@
+# Agent Memory System
+# Copyright (C) 2024 kiwifruit
+#
+# This file is part of Agent Memory System.
+#
+# Agent Memory System is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Agent Memory System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Agent Memory System.  If not, see <https://www.gnu.org/licenses/>.
+
+
 """
 Agent Memory System - Memory Forgetting Mechanism（记忆遗忘机制）
 
@@ -48,7 +67,7 @@ class ForgettingTrigger(str, Enum):
     TIME_DECAY = "time_decay"                # 时间衰减
     LOW_ACCESS = "low_access"                # 低访问
     REDUNDANCY = "redundancy"                # 冗余
-    IRRELEVANCE = "irrelevance"              |  # 不相关
+    IRRELEVANCE = "irrelevance"              # 不相关
     CONFLICT = "conflict"                    # 冲突
     EXPLICIT = "explicit"                    # 显式标记
 
@@ -67,7 +86,7 @@ class MemoryState(str, Enum):
     """记忆状态"""
 
     ACTIVE = "active"            # 活跃
-    DORMANT = "dormant"          |  # 休眠
+    DORMANT = "dormant"          # 休眠
     ARCHIVED = "archived"        # 已归档
     DELETED = "deleted"          # 已删除
 

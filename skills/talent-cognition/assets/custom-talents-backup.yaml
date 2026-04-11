@@ -1,0 +1,106 @@
+talents:
+- constraints:
+  - 保持快速迭代节奏
+  - 能够根据反馈及时调整
+  - 注重交付价值而非完美
+  - 能处理不确定性
+  description: 具备敏捷开发思维和实践能力，能够快速迭代、持续改进，灵活应对变化
+  features:
+    complexity:
+    - medium
+    - complex
+    domains:
+    - technical
+    - business
+    interactivity:
+    - interactive
+    output_formats:
+    - text
+    - structured
+    precision:
+    - normal
+    task_types:
+    - planning
+    - execution
+    - decision
+    time_pressure:
+    - normal
+    - urgent
+  id: agile_development
+  name: 敏捷开发
+  weights:
+    complexity: 0.2
+    domain: 0.2
+    task_type: 0.4
+    time_pressure: 0.2
+- constraints:
+  - 保持简洁高效，避免过度分析
+  - 能考虑决策的长期影响（10年以上）
+  - 能够平衡短期收益和长期价值
+  - 能识别关键成功因素
+  description: 具备卓越的战略决策能力，能够进行长远规划，考虑多维度因素，做出最优决策
+  features:
+    complexity:
+    - medium
+    - complex
+    domains:
+    - business
+    - career
+    - academic
+    interactivity:
+    - one_way
+    - interactive
+    output_formats:
+    - structured
+    - text
+    precision:
+    - normal
+    - precise
+    task_types:
+    - planning
+    - decision
+    time_pressure:
+    - normal
+    - relaxed
+  id: strategy_decisions
+  name: 战略决策（增强版）
+  weights:
+    complexity: 0.2
+    domain: 0.1
+    precision: 0.2
+    task_type: 0.5
+- constraints:
+  - 保持客观严谨的数据态度
+  - 能够处理大量数据
+  - 能识别数据中的模式和异常
+  - 能将数据转化为可执行的建议
+  description: 擅长从数据中提取洞察，发现模式和趋势，支持数据驱动的决策
+  features:
+    complexity:
+    - simple
+    - medium
+    domains:
+    - technical
+    - business
+    - academic
+    interactivity:
+    - one_way
+    output_formats:
+    - data
+    - structured
+    precision:
+    - precise
+    task_types:
+    - analysis
+    - research
+    - decision
+    time_pressure:
+    - normal
+  id: data_analysis
+  name: 数据分析
+  weights:
+    complexity: 0.2
+    output_format: 0.3
+    precision: 0.2
+    task_type: 0.3
+version: '1.0'

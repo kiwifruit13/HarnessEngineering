@@ -533,3 +533,8 @@ IncrementalSync(storage_path: str = "./sync_state")
 3. **分层读取**：热/温/冷数据分层处理
 
 这些机制确保了系统在长对话、多任务场景下的高效运行。
+
+## 参考文档
+
+- [架构总览](architecture_overview.md)
+- [短期记忆到长期记忆映射](memory_types.md#短期记忆到长期记忆映射)
